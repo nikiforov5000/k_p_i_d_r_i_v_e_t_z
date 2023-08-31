@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:k_p_i_d_r_i_v_e_t_z/model/indicator.dart';
 
 class IndicatorViewModel {
-  List<Indicator> indicators = [];
+  StreamController<List<Indicator>> _streamController = StreamController<List<Indicator>>();
+  Stream<List<Indicator>> get stream => _streamController.stream;
 
   IndicatorViewModel() {
     fetchData();
@@ -40,8 +43,8 @@ class IndicatorViewModel {
       convert.jsonDecode(responseBody) as Map<String, dynamic>;
       final data = jsonResponse['DATA'];
       final rows = data['rows'] as List;
-
-      indicators = rows.map((json) => Indicator.fromJson(json)).toList();
+      final indicators = rows.map((json) => Indicator.fromJson(json)).toList();
+      _streamController.add(indicators);
       print(indicators.first.name);
     } else {
       print('Response code:${response.statusCode}');
